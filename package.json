@@ -1,0 +1,28 @@
+{
+  "name": "detector-plagio",
+  "version": "1.0.0",
+  "description": "Proyecto para detectar plagio entre textos utilizando Node.js y la librería Natural.",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RitoTorri/Detector-Plagio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RitoTorri/Detector-Plagio/issues"
+  },
+  "homepage": "https://github.com/RitoTorri/Detector-Plagio#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "natural": "^8.1.0"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.1",
+    "nodemon": "^3.1.10"
+  }
+}
