@@ -1,9 +1,9 @@
 // Imports
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const controllerCalculate = require('../controllers/calculate.plagiarism.controller');
+import controllerCalculate from '../controllers/calculate.plagiarism.controller.js';
 
 // Routes
-router.get('/calculate/plagiarism', controllerCalculate.calculatePlagiarism);
+router.post('/calculate/plagiarism', controllerCalculate.calculatePlagiarism);
 
-module.exports = router;
+export default router;

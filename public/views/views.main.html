@@ -4,11 +4,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="/public/styles/style.css">
+    <title>Detector de Plagio</title>
 </head>
 
 <body>
-    <h1>Welcome to the Main View</h1>
+    <main class="container">
+        <h1 id="Inicio">Detector de plagio</h1>
+        <p>Bienvenido a nuestra plataforma de detección de plagio, una solución avanzada diseñada para preservar la
+            autenticidad y originalidad en la creación de contenido.
+        </p>
+
+        <h3>¿Por qué es importante detectar el plagio?</h3>
+        <p>En un mundo digital donde la información fluye constantemente, garantizar la originalidad del contenido
+            se ha vuelto esencial para:</p>
+        <ul>
+            <li>Proteger la propiedad intelectual</li>
+            <li>Mantener la integridad académica</li>
+            <li>Fomentar la creatividad genuina</li>
+            <li>Evitar consecuencias legales y profesionales</li>
+        </ul>
+
+        <h3>¿Cómo funciona el detector de plagio?</h3>
+        <p>El usuario introduce un texto y el servicio calcula la similitud entre el texto y un conjunto de
+            artículos de textos de diferentes autores. El resultado es un porcentaje con el articulo más similar
+            con el texto introducido.</p>
+
+        <h3>Probar el servicio</h3>
+
+        <!-- Resultados arriba del textarea -->
+        <div id="Resultado" style="display: none;">
+            <h2>Resultado del Análisis</h2>
+
+            <div class="similarity-result">
+                <p class="percentage-exact" id="PorcentajeExacto">Porcentaje de similitud: 0%</p>
+
+                <!-- Barra de progreso -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="ProgressBar">
+                        <div class="progress-percentage" id="ProgressPercentage">0%</div>
+                    </div>
+                </div>
+
+                <!-- Marcas de referencia -->
+                <div class="progress-marks">
+                    <span class="progress-mark">0%</span>
+                    <span class="progress-mark">25%</span>
+                    <span class="progress-mark">50%</span>
+                    <span class="progress-mark">75%</span>
+                    <span class="progress-mark">100%</span>
+                </div>
+
+                <p id="NivelSimilitud">Nivel: <span class="result-label" id="ResultLabel">Bajo</span></p>
+            </div>
+
+            <div class="document-info">
+                <p id="Autor">Autor: </p>
+                <p id="Titulo">Titulo: </p>
+                <p id="Fecha">Fecha: </p>
+            </div>
+        </div>
+
+        <textarea id="Texto" placeholder="Introduce el texto que deseas analizar" rows="10" cols="100"></textarea>
+        <span id="Error">error</span>
+        <button id="Boton">Analizar Texto</button>
+    </main>
+
+    <script src="/public/scripts/script.js"></script>
 </body>
 
 </html>

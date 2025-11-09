@@ -1,15 +1,20 @@
-const responses = require('../utils/responses');
-const serviceCalculate = require('../services/calculate.plagiarism.service');
+import servicesCalculate from '../services/calculate.plagiarism.service.js';
+import responses from '../utils/responses.js';
 
 class CalculatePlagiarismController {
     constructor() { }
 
     async calculatePlagiarism(req, res) {
         try {
-            serviceCalculate.calculatePlagiarism();
+            const { textUser } = req.body;
+
+            const result = await servicesCalculate.calculatePlagiarism(textUser);
+            return responses.QuerySuccess(res, result);
         } catch (error) {
+            console.error("Error in calculatePlagiarism controller:", error);
+            return responses.QueryError(res, error.message);
         }
     }
 }
 
-module.exports = new CalculatePlagiarismController();
+export default new CalculatePlagiarismController();

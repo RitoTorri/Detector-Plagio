@@ -1,13 +1,19 @@
-// Este archivo contiene las rutas de las vistas
-
 // Imports
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const path = require('path');
+
+// impor de los paths
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Necesario para usar __dirname con ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 // Routes
 router.get('/send/views', function (req, res) {
-    res.sendFile(path.join(__dirname, '../../public/views/views.main.html'));
+    console.log(path.join(__dirname, '../../public/views/views.main.html'));
+    res.sendFile(path.join(__dirname, '../../public/views/views.main.html'))
 });
-
-module.exports = router;
+export default router;
