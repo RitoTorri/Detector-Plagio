@@ -11,7 +11,6 @@ class CalculatePlagiarismController {
             const result = await servicesCalculate.calculatePlagiarism(textUser);
             return responses.QuerySuccess(res, result);
         } catch (error) {
-            console.error("Error in calculatePlagiarism controller:", error);
             return responses.QueryError(res, error.message);
         }
     }

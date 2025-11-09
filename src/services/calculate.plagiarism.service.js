@@ -47,7 +47,7 @@ class CalculatePlagiarismService {
                 }
             }
 
-            // Retornar solo el artículo más similar con porcentaje y metadatos
+            // Retornar solo el artículo más similar console porcentaje y metadatos
             return {
                 porcentaje: maxSimilitud.toFixed(2),
                 archivo: articuloMasSimilar?.nameFile || null,
