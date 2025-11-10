@@ -14,10 +14,17 @@ const SendText = () => {
     const progressPercentage = document.getElementById("ProgressPercentage");
     const resultLabel = document.getElementById("ResultLabel");
 
+    // Elementos simplificados
+    const infoAdicional = document.getElementById("InfoAdicional");
+    const palabrasAnalizadas = document.getElementById("PalabrasAnalizadas");
+    const documentInfo = document.querySelector('.document-info');
+
     // Función para ocultar resultados
     const ocultarResultados = () => {
         resultado.classList.remove("mostrar");
         resultado.style.display = "none";
+        infoAdicional.style.display = "none";
+        documentInfo.style.display = "block";
     };
 
     // Función para limpiar todo
@@ -61,12 +68,30 @@ const SendText = () => {
         porcentajeExacto.textContent = `Porcentaje de similitud: ${porcentajeValor}%`;
     };
 
+    // Función para mostrar/ocultar información del documento
+    const mostrarInfoDocumento = (mostrar, data) => {
+        if (mostrar && data) {
+            documentInfo.style.display = "block";
+            autor.innerHTML = "Autor: " + (data.data.autor || "No disponible");
+            titulo.innerHTML = "Titulo: " + (data.data.titulo || "No disponible");
+            fecha.innerHTML = "Fecha: " + (data.data.fecha || "No disponible");
+        } else {
+            documentInfo.style.display = "none";
+        }
+    };
+
     boton.addEventListener("click", async () => {
         // Limpiar estado previo
         limpiarEstado();
 
         if (text.value.length === 0) {
             error.innerHTML = "El texto no puede estar vacío";
+            error.classList.add("mostrar");
+            return;
+        }
+
+        if (text.value.length < 10) {
+            error.innerHTML = "El texto debe tener al menos 10 caracteres";
             error.classList.add("mostrar");
             return;
         }
@@ -89,24 +114,50 @@ const SendText = () => {
             const data = await response.json();
 
             if (data.success) {
-                const porcentajeValor = data.data.porcentaje;
+                const porcentajeValor = parseFloat(data.data.porcentaje);
+                const esPlagio = data.data.esPlagio;
 
-                // Verificar si el porcentaje es menor a 10%
-                if (porcentajeValor < 10) {
-                    error.innerHTML = "✅ Este texto no es plagio (similitud menor al 10%)";
+                // Mostrar información adicional
+                palabrasAnalizadas.textContent = data.data.palabrasComparadas || 'N/A';
+
+                // VERIFICAR SI ES PLAGIO O NO
+                if (!esPlagio) {
+                    // SI NO ES PLAGIO - mostrar mensaje de éxito
+                    error.innerHTML = `✅ Este texto no es plagio (${porcentajeValor}% de similitud)`;
                     error.classList.add("mostrar");
                     error.classList.add("exito");
-                    ocultarResultados();
-                } else {
-                    // Mostrar resultados completos
-                    autor.innerHTML = "Autor: " + data.data.autor;
-                    titulo.innerHTML = "Titulo: " + data.data.titulo;
-                    fecha.innerHTML = "Fecha: " + data.data.fecha;
 
+                    // Mostrar información adicional
+                    infoAdicional.style.display = "block";
+
+                    // Si la similitud es 0%, no mostrar información del documento
+                    if (porcentajeValor === 0) {
+                        mostrarInfoDocumento(false, null);
+                    } else {
+                        // Si hay algo de similitud pero no es plagio, mostrar info del documento
+                        mostrarInfoDocumento(true, data);
+                    }
+
+                    // Mostrar resultados
                     actualizarBarraProgreso(0);
-
                     resultado.style.display = "block";
                     resultado.classList.add("mostrar");
+
+                    setTimeout(() => {
+                        actualizarBarraProgreso(porcentajeValor);
+                    }, 300);
+
+                } else {
+                    // SI ES PLAGIO - mostrar toda la información
+                    error.innerHTML = `⚠️ Posible plagio detectado (${porcentajeValor}% de similitud)`;
+                    error.classList.add("mostrar");
+
+                    mostrarInfoDocumento(true, data);
+
+                    actualizarBarraProgreso(0);
+                    resultado.style.display = "block";
+                    resultado.classList.add("mostrar");
+                    infoAdicional.style.display = "block";
 
                     setTimeout(() => {
                         actualizarBarraProgreso(porcentajeValor);

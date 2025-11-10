@@ -363,6 +363,30 @@ button:active {
     margin-top: 20px;
 }
 
+/* Información adicional */
+#InfoAdicional p {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+#ListaCoincidencias li {
+    background: #f8fafc;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border-left: 3px solid #3b82f6;
+    font-size: 1rem;
+}
+
+#ListaCoincidencias li::before {
+    content: '"';
+    background: transparent;
+    color: #3b82f6;
+    font-size: 1.5rem;
+    width: auto;
+    height: auto;
+}
+
 /* Animaciones */
 @keyframes slideUp {
     from {
