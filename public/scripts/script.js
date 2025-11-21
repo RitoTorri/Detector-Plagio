@@ -2,29 +2,31 @@ const SendText = () => {
     const text = document.getElementById("Texto");
     const boton = document.getElementById("Boton");
     const error = document.getElementById("Error");
+    const charCount = document.getElementById("CharCount");
 
     const resultado = document.getElementById("Resultado");
-    const porcentajeExacto = document.getElementById("PorcentajeExacto");
+    const porcentajeValor = document.getElementById("PorcentajeValor");
     const autor = document.getElementById("Autor");
     const titulo = document.getElementById("Titulo");
-    const fecha = document.getElementById("Fecha");
-    const nivelSimilitud = document.getElementById("NivelSimilitud");
+    const estadoAnalisis = document.getElementById("EstadoAnalisis");
 
     const progressBar = document.getElementById("ProgressBar");
     const progressPercentage = document.getElementById("ProgressPercentage");
     const resultLabel = document.getElementById("ResultLabel");
+    const resultIcon = document.getElementById("ResultIcon");
 
     // Elementos simplificados
-    const infoAdicional = document.getElementById("InfoAdicional");
     const palabrasAnalizadas = document.getElementById("PalabrasAnalizadas");
-    const documentInfo = document.querySelector('.document-info');
+
+    // Actualizar contador de caracteres
+    const actualizarContador = () => {
+        charCount.textContent = text.value.length;
+    };
 
     // Función para ocultar resultados
     const ocultarResultados = () => {
         resultado.classList.remove("mostrar");
         resultado.style.display = "none";
-        infoAdicional.style.display = "none";
-        documentInfo.style.display = "block";
     };
 
     // Función para limpiar todo
@@ -35,50 +37,67 @@ const SendText = () => {
     };
 
     // Función para actualizar la barra de progreso
-    const actualizarBarraProgreso = (porcentajeValor) => {
-        progressBar.style.width = porcentajeValor + '%';
-        progressPercentage.textContent = porcentajeValor + '%';
+    const actualizarBarraProgreso = (porcentaje) => {
+        progressBar.style.width = porcentaje + '%';
+        progressPercentage.textContent = porcentaje + '%';
+        porcentajeValor.textContent = porcentaje + '%';
 
         const containerWidth = progressBar.parentElement.offsetWidth;
-        const barWidth = (porcentajeValor / 100) * containerWidth;
+        const barWidth = (porcentaje / 100) * containerWidth;
         progressPercentage.style.left = barWidth + 'px';
 
         let nivel = 'bajo';
         let textoLabel = 'Bajo';
+        let iconColor = '#10b981';
+        let iconBackground = '#d1fae5';
 
-        if (porcentajeValor >= 80) {
+        if (porcentaje >= 80) {
             nivel = 'critico';
             textoLabel = 'Crítico';
-        } else if (porcentajeValor >= 60) {
+            iconColor = '#dc2626';
+            iconBackground = '#fecaca';
+        } else if (porcentaje >= 60) {
             nivel = 'alto';
             textoLabel = 'Alto';
-        } else if (porcentajeValor >= 30) {
+            iconColor = '#ef4444';
+            iconBackground = '#fee2e2';
+        } else if (porcentaje >= 30) {
             nivel = 'medio';
             textoLabel = 'Moderado';
+            iconColor = '#f59e0b';
+            iconBackground = '#fef3c7';
         } else {
             nivel = 'bajo';
             textoLabel = 'Bajo';
+            iconColor = '#10b981';
+            iconBackground = '#d1fae5';
         }
 
         progressBar.className = 'progress-bar ' + nivel;
-        resultLabel.className = 'result-label ' + nivel;
+        resultLabel.className = 'level-badge ' + nivel;
         resultLabel.textContent = textoLabel;
 
-        nivelSimilitud.innerHTML = `Nivel: <span class="result-label ${nivel}">${textoLabel}</span>`;
-        porcentajeExacto.textContent = `Porcentaje de similitud: ${porcentajeValor}%`;
+        // Actualizar color del icono
+        resultIcon.style.background = iconBackground;
+        resultIcon.querySelector('svg').style.color = iconColor;
     };
 
-    // Función para mostrar/ocultar información del documento
-    const mostrarInfoDocumento = (mostrar, data) => {
-        if (mostrar && data) {
-            documentInfo.style.display = "block";
-            autor.innerHTML = "Autor: " + (data.data.autor || "No disponible");
-            titulo.innerHTML = "Titulo: " + (data.data.titulo || "No disponible");
-            fecha.innerHTML = "Fecha: " + (data.data.fecha || "No disponible");
+    // Función para mostrar información del documento
+    const mostrarInfoDocumento = (data) => {
+        if (data && data.data) {
+            autor.textContent = data.data.autor || "No disponible";
+            titulo.textContent = data.data.titulo || "No disponible";
         } else {
-            documentInfo.style.display = "none";
+            autor.textContent = "No disponible";
+            titulo.textContent = "No disponible";
         }
     };
+
+    // Event listener para el contador de caracteres
+    text.addEventListener("input", () => {
+        actualizarContador();
+        limpiarEstado();
+    });
 
     boton.addEventListener("click", async () => {
         // Limpiar estado previo
@@ -114,7 +133,7 @@ const SendText = () => {
             const data = await response.json();
 
             if (data.success) {
-                const porcentajeValor = parseFloat(data.data.porcentaje);
+                const porcentaje = parseFloat(data.data.porcentaje);
                 const esPlagio = data.data.esPlagio;
 
                 // Mostrar información adicional
@@ -123,46 +142,28 @@ const SendText = () => {
                 // VERIFICAR SI ES PLAGIO O NO
                 if (!esPlagio) {
                     // SI NO ES PLAGIO - mostrar mensaje de éxito
-                    error.innerHTML = `✅ Este texto no es plagio (${porcentajeValor}% de similitud)`;
+                    error.innerHTML = `✅ Este texto no es plagio (${porcentaje}% de similitud)`;
                     error.classList.add("mostrar");
                     error.classList.add("exito");
-
-                    // Mostrar información adicional
-                    infoAdicional.style.display = "block";
-
-                    // Si la similitud es 0%, no mostrar información del documento
-                    if (porcentajeValor === 0) {
-                        mostrarInfoDocumento(false, null);
-                    } else {
-                        // Si hay algo de similitud pero no es plagio, mostrar info del documento
-                        mostrarInfoDocumento(true, data);
-                    }
-
-                    // Mostrar resultados
-                    actualizarBarraProgreso(0);
-                    resultado.style.display = "block";
-                    resultado.classList.add("mostrar");
-
-                    setTimeout(() => {
-                        actualizarBarraProgreso(porcentajeValor);
-                    }, 300);
-
+                    estadoAnalisis.textContent = "Sin plagio";
                 } else {
                     // SI ES PLAGIO - mostrar toda la información
-                    error.innerHTML = `⚠️ Posible plagio detectado (${porcentajeValor}% de similitud)`;
+                    error.innerHTML = `⚠️ Posible plagio detectado (${porcentaje}% de similitud)`;
                     error.classList.add("mostrar");
-
-                    mostrarInfoDocumento(true, data);
-
-                    actualizarBarraProgreso(0);
-                    resultado.style.display = "block";
-                    resultado.classList.add("mostrar");
-                    infoAdicional.style.display = "block";
-
-                    setTimeout(() => {
-                        actualizarBarraProgreso(porcentajeValor);
-                    }, 300);
+                    estadoAnalisis.textContent = "Posible plagio";
                 }
+
+                // Mostrar información del documento
+                mostrarInfoDocumento(data);
+
+                // Mostrar resultados
+                actualizarBarraProgreso(0);
+                resultado.style.display = "block";
+                resultado.classList.add("mostrar");
+
+                setTimeout(() => {
+                    actualizarBarraProgreso(porcentaje);
+                }, 300);
 
             } else {
                 error.innerHTML = data.message || "Error al procesar la solicitud";
@@ -179,10 +180,8 @@ const SendText = () => {
         }
     });
 
-    // Limpiar cuando el usuario escriba
-    text.addEventListener("input", () => {
-        limpiarEstado();
-    });
+    // Inicializar contador de caracteres
+    actualizarContador();
 };
 
 addEventListener('DOMContentLoaded', SendText);

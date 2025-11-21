@@ -6,74 +6,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/public/img/Icon.png" type="image/x-icon">
     <link rel="stylesheet" href="/public/styles/style.css">
-    <title>Detector de Plagio - Coincidencia Directa</title>
+    <title>Detector de Plagio</title>
 </head>
 
 <body>
     <main class="container">
-        <h1 id="Inicio">Detector de Plagio Avanzado</h1>
-        <p>Bienvenido a nuestra plataforma de detección de plagio, que utiliza un sistema de coincidencia directa para
-            identificar similitudes textuales con máxima precisión.</p>
-
-        <h3>¿Por qué es importante detectar el plagio?</h3>
-        <p>En un mundo digital donde la información fluye constantemente, garantizar la originalidad del contenido se ha
-            vuelto esencial para:</p>
-        <ul>
-            <li>Proteger la propiedad intelectual</li>
-            <li>Mantener la integridad académica</li>
-            <li>Fomentar la creatividad genuina</li>
-            <li>Evitar consecuencias legales y profesionales</li>
-        </ul>
-
-        <h3>¿Cómo funciona nuestro detector?</h3>
-        <p>Nuestro sistema analiza coincidencias directas de palabras clave y secuencias textuales, comparando tu texto
-            con una base de datos de artículos académicos. Esto garantiza una detección precisa sin falsos positivos por
-            similitudes semánticas.</p>
-
-        <h3>Probar el servicio</h3>
+        <div class="header-section">
+            <div class="logo-title">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <h1>Detector de Plagio</h1>
+            </div>
+            <p class="subtitle">Analiza tu texto para detectar similitudes con otras fuentes</p>
+        </div>
 
         <!-- Resultados arriba del textarea -->
-        <div id="Resultado" style="display: none;">
-            <h2>Resultado del Análisis</h2>
+        <div id="Resultado" class="result-container">
+            <div class="result-header">
+                <h2>Resultado del Análisis</h2>
+                <div class="result-icon" id="ResultIcon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
 
             <div class="similarity-result">
-                <p class="percentage-exact" id="PorcentajeExacto">Porcentaje de similitud: 0%</p>
-
-                <!-- Barra de progreso -->
-                <div class="progress-container">
-                    <div class="progress-bar" id="ProgressBar">
-                        <div class="progress-percentage" id="ProgressPercentage">0%</div>
+                <!-- Tarjeta principal de porcentaje -->
+                <div class="percentage-card">
+                    <div class="percentage-display">
+                        <span class="percentage-value" id="PorcentajeValor">0%</span>
+                        <span class="percentage-label">Similitud Detectada</span>
+                    </div>
+                    <div class="level-indicator">
+                        <span class="level-badge" id="ResultLabel">Bajo</span>
                     </div>
                 </div>
 
-                <!-- Marcas de referencia -->
-                <div class="progress-marks">
-                    <span class="progress-mark">0%</span>
-                    <span class="progress-mark">25%</span>
-                    <span class="progress-mark">50%</span>
-                    <span class="progress-mark">75%</span>
-                    <span class="progress-mark">100%</span>
+                <!-- Barra de progreso -->
+                <div class="progress-section">
+                    <div class="progress-container">
+                        <div class="progress-bar" id="ProgressBar">
+                            <div class="progress-percentage" id="ProgressPercentage">0%</div>
+                        </div>
+                    </div>
+
+                    <!-- Marcas de referencia -->
+                    <div class="progress-marks">
+                        <span class="progress-mark">0%</span>
+                        <span class="progress-mark">25%</span>
+                        <span class="progress-mark">50%</span>
+                        <span class="progress-mark">75%</span>
+                        <span class="progress-mark">100%</span>
+                    </div>
                 </div>
 
-                <p id="NivelSimilitud">Nivel: <span class="result-label" id="ResultLabel">Bajo</span></p>
+                <!-- Información en tarjetas -->
+                <div class="info-cards">
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M9 12H15M9 16H15M9 20H15M5 4H19C20.1046 4 21 4.89543 21 6V18C21 19.1046 20.1046 20 19 20H5C3.89543 20 3 19.1046 3 18V6C3 4.89543 3.89543 4 5 4Z"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-label">Palabras Analizadas</span>
+                            <span class="card-value" id="PalabrasAnalizadas">0</span>
+                        </div>
+                    </div>
 
-                <!-- Nuevos elementos para la información adicional -->
-                <div id="InfoAdicional" style="margin-top: 20px; display: none;">
-                    <p><strong>Palabras analizadas:</strong> <span id="PalabrasAnalizadas">0</span></p>
+                    <div class="info-card">
+                        <div class="card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
+                                    stroke="currentColor" stroke-width="2" />
+                                <path
+                                    d="M19.4 15C19.2669 15.3044 19.1333 15.6084 19 15.912C18.438 17.164 17.748 18.188 16.93 18.984C15.346 20.524 13.244 21.344 11 21.344C8.756 21.344 6.654 20.524 5.07 18.984C4.252 18.188 3.562 17.164 3 15.912C2.86667 15.6084 2.73312 15.3044 2.6 15C2.73312 14.6956 2.86667 14.3916 3 14.088C3.562 12.836 4.252 11.812 5.07 11.016C6.654 9.476 8.756 8.656 11 8.656C13.244 8.656 15.346 9.476 16.93 11.016C17.748 11.812 18.438 12.836 19 14.088C19.1333 14.3916 19.2669 14.6956 19.4 15Z"
+                                    stroke="currentColor" stroke-width="2" />
+                            </svg>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-label">Estado del Análisis</span>
+                            <span class="card-value" id="EstadoAnalisis">Sin plagio</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="document-info">
-                <p id="Autor">Autor: </p>
-                <p id="Titulo">Titulo: </p>
-                <p id="Fecha">Fecha: </p>
+                <!-- Información del documento -->
+                <div class="document-card">
+                    <h3 class="document-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M16 7C16 6.46957 16.2107 5.96086 16.5858 5.58579C16.9609 5.21071 17.4696 5 18 5H20C20.5304 5 21.0391 5.21071 21.4142 5.58579C21.7893 5.96086 22 6.46957 22 7V19C22 19.5304 21.7893 20.0391 21.4142 20.4142C21.0391 20.7893 20.5304 21 20 21H4C3.46957 21 2.96086 20.7893 2.58579 20.4142C2.21071 20.0391 2 19.5304 2 19V5C2 4.46957 2.21071 3.96086 2.58579 3.58579C2.96086 3.21071 3.46957 3 4 3H14"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                        Información del Documento
+                    </h3>
+                    <div class="document-details">
+                        <div class="document-item">
+                            <span class="document-label">Autor:</span>
+                            <span class="document-value" id="Autor">No disponible</span>
+                        </div>
+                        <div class="document-item">
+                            <span class="document-label">Título:</span>
+                            <span class="document-value" id="Titulo">No disponible</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <textarea id="Texto" placeholder="Introduce el texto que deseas analizar (mínimo 10 caracteres)" rows="10"
-            cols="100"></textarea>
-        <span id="Error">error</span>
-        <button id="Boton">Analizar Texto</button>
+        <div class="input-section">
+            <div class="textarea-container">
+                <label for="Texto" class="input-label">Introduce el texto a analizar</label>
+                <textarea id="Texto" placeholder="Pega aquí el texto que deseas analizar (mínimo 10 caracteres)"
+                    rows="10"></textarea>
+                <div class="char-counter">
+                    <span id="CharCount">0</span> caracteres
+                </div>
+            </div>
+
+            <div id="Error" class="error-message">error</div>
+
+            <button id="Boton" class="analyze-button">
+                <span class="button-text">Analizar Texto</span>
+                <span class="button-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M9.5 12H14.5M9.5 16H14.5M19 4H5C4.44772 4 4 4.44772 4 5V19C4 19.5523 4.44772 20 5 20H19C19.5523 20 20 19.5523 20 19V5C20 4.44772 19.5523 4 19 4Z"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+            </button>
+        </div>
     </main>
 
     <script src="/public/scripts/script.js"></script>
