@@ -64,6 +64,8 @@ const translante = async () => {
     // Almacenamos los pdfs que no tienen jsons asociados
     const PdfWithoutJson = PdfDeleteExtension.filter(pdf => !JsonDeleteExtension.includes(pdf.split(",")[0]));
 
+    if (PdfWithoutJson.length === 0) return;
+
     // Le agregamos la extension .pdf a los pdfs que no tienen jsons asociados
     const PdfParseToJson = PdfWithoutJson.map(pdf => `${pdf}.pdf`);
 

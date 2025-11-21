@@ -109,8 +109,8 @@ const SendText = () => {
             return;
         }
 
-        if (text.value.length < 10) {
-            error.innerHTML = "El texto debe tener al menos 10 caracteres";
+        if (text.value.length < 50) {
+            error.innerHTML = "El texto debe tener al menos 50 caracteres";
             error.classList.add("mostrar");
             return;
         }
