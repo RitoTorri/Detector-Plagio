@@ -40,7 +40,7 @@ el-libro-de-la-muerte, jesus-perez.pdf
 
 ### Formato de contenido del archivo:
 
-El contenido del archivo debe ser un texto plano, sin formato de imagen.
+El contenido del archivo debe ser un texto plano, sin formato de imagen. Si ocurre el caso de que tenga formato imagen la conversion falla.
 
 **Ejemplo**:  
 <div style="text-align: center">
