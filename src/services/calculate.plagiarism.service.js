@@ -5,12 +5,28 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Función segura para decodificar URI (solución al error URI malformed)
+function safeDecodeURIComponent(str) {
+    if (!str || typeof str !== 'string') return '';
+
+    try {
+        return decodeURIComponent(str);
+    } catch (error) {
+        // Si falla la decodificación, limpiar caracteres % malformados
+        console.warn('Error decodificando URI, usando texto limpio');
+        return str
+            .replace(/%(?![0-9A-Fa-f]{2})/g, '') // Eliminar % malformados
+            .replace(/%%/g, '%') // Reemplazar %% por %
+            .replace(/%$/g, ''); // Eliminar % al final
+    }
+}
+
 class CalculatePlagiarismService {
     constructor() {
         this.carpeta = path.join(__dirname, "../../books/jsons");
         this.articulosCache = null;
-        this.umbralSimilitud = 60; // Aumentado para plagio real
-        this.umbralAdvertencia = 30; // Para similitud moderada
+        this.umbralSimilitud = 60;
+        this.umbralAdvertencia = 30;
 
         this.palabrasComunes = new Set([
             'el', 'la', 'los', 'las', 'de', 'del', 'en', 'y', 'a', 'con', 'por', 'para',
@@ -37,21 +53,24 @@ class CalculatePlagiarismService {
                         const data = await fs.readFile(path.join(this.carpeta, archivo), "utf8");
                         const articulo = JSON.parse(data);
 
-                        const contenidoLimpio = this.limpiarTexto(articulo.contenido);
+                        // Usar decodificación segura si el contenido viene codificado
+                        const contenidoDecodificado = articulo.contenido ?
+                            safeDecodeURIComponent(articulo.contenido) : articulo.contenido;
+
+                        const contenidoLimpio = this.limpiarTexto(contenidoDecodificado);
 
                         return {
                             nameFile: archivo,
                             titulo: articulo.titulo,
                             autor: articulo.autor,
                             fecha: articulo.fecha,
-                            contenido: articulo.contenido,
+                            contenido: contenidoDecodificado,
                             contenidoLimpio: contenidoLimpio,
-                            // Pre-calcular para mejor performance
                             palabrasUnicas: new Set(this.extraerPalabrasClave(contenidoLimpio)),
                             ngramas: this.generarTodosNgramas(contenidoLimpio)
                         };
                     } catch (error) {
-                        console.error(`Error cargando ${archivo}:`, error);
+                        console.error(`Error cargando ${archivo}:`, error.message);
                         return null;
                     }
                 })
@@ -61,6 +80,7 @@ class CalculatePlagiarismService {
             return this.articulosCache;
 
         } catch (error) {
+            console.error('Error cargando artículos:', error.message);
             throw new Error(`Error cargando artículos: ${error.message}`);
         }
     }
@@ -77,16 +97,26 @@ class CalculatePlagiarismService {
     }
 
     extraerPalabrasClave(textoLimpio) {
+        if (!textoLimpio) return [];
+
         return textoLimpio
             .split(' ')
             .filter(palabra =>
-                palabra.length > 3 &&
+                palabra && palabra.length > 3 &&
                 !this.palabrasComunes.has(palabra)
             );
     }
 
     generarTodosNgramas(texto) {
-        const palabras = texto.split(' ');
+        if (!texto) {
+            return {
+                bigramas: new Set(),
+                trigramas: new Set(),
+                tetragramas: new Set()
+            };
+        }
+
+        const palabras = texto.split(' ').filter(p => p);
         const todosNgramas = {
             bigramas: new Set(),
             trigramas: new Set(),
@@ -96,25 +126,33 @@ class CalculatePlagiarismService {
         // Bigramas (2 palabras)
         for (let i = 0; i <= palabras.length - 2; i++) {
             const bigrama = palabras.slice(i, i + 2).join(' ');
-            todosNgramas.bigramas.add(bigrama);
+            if (bigrama.trim().length > 0) {
+                todosNgramas.bigramas.add(bigrama);
+            }
         }
 
         // Trigramas (3 palabras)
         for (let i = 0; i <= palabras.length - 3; i++) {
             const trigrama = palabras.slice(i, i + 3).join(' ');
-            todosNgramas.trigramas.add(trigrama);
+            if (trigrama.trim().length > 0) {
+                todosNgramas.trigramas.add(trigrama);
+            }
         }
 
         // Tetragramas (4 palabras)
         for (let i = 0; i <= palabras.length - 4; i++) {
             const tetragrama = palabras.slice(i, i + 4).join(' ');
-            todosNgramas.tetragramas.add(tetragrama);
+            if (tetragrama.trim().length > 0) {
+                todosNgramas.tetragramas.add(tetragrama);
+            }
         }
 
         return todosNgramas;
     }
 
     calcularSimilitudCompleta(textoUsuario, articulo) {
+        if (!textoUsuario || !articulo) return 0;
+
         const palabrasUsuario = this.extraerPalabrasClave(textoUsuario);
         const ngramasUsuario = this.generarTodosNgramas(textoUsuario);
 
@@ -124,7 +162,7 @@ class CalculatePlagiarismService {
         const coincidenciasPalabras = palabrasUsuario.filter(palabra =>
             articulo.palabrasUnicas.has(palabra)
         ).length;
-        const similitudPalabras = (coincidenciasPalabras / palabrasUsuario.length) * 100;
+        const similitudPalabras = (coincidenciasPalabras / Math.max(palabrasUsuario.length, 1)) * 100;
 
         // 2. Similitud por bigramas (25%)
         let coincidenciasBigramas = 0;
@@ -158,7 +196,9 @@ class CalculatePlagiarismService {
     }
 
     encontrarCoincidenciasSustanciales(textoUsuario, contenidoArticulo) {
-        const palabrasUsuario = textoUsuario.split(' ');
+        if (!textoUsuario || !contenidoArticulo) return [];
+
+        const palabrasUsuario = textoUsuario.split(' ').filter(p => p);
         const fragmentosCoincidentes = [];
 
         // Buscar secuencias largas (mínimo 8 palabras)
@@ -167,13 +207,13 @@ class CalculatePlagiarismService {
                 if (i + longitud > palabrasUsuario.length) break;
 
                 const secuencia = palabrasUsuario.slice(i, i + longitud).join(' ');
-                if (contenidoArticulo.includes(secuencia)) {
+                if (secuencia && contenidoArticulo.includes(secuencia)) {
                     fragmentosCoincidentes.push({
                         texto: secuencia,
                         longitud: longitud,
                         posicion: i
                     });
-                    i += longitud - 1; // Saltar la secuencia encontrada
+                    i += longitud - 1;
                     break;
                 }
             }
@@ -183,9 +223,12 @@ class CalculatePlagiarismService {
     }
 
     calcularPorcentajeTextoCoincidente(textoUsuario, contenidoArticulo, coincidencias) {
-        if (coincidencias.length === 0) return 0;
+        if (!textoUsuario || coincidencias.length === 0) return 0;
 
-        const totalPalabrasUsuario = textoUsuario.split(' ').length;
+        const palabrasUsuario = textoUsuario.split(' ').filter(p => p);
+        const totalPalabrasUsuario = palabrasUsuario.length;
+        if (totalPalabrasUsuario === 0) return 0;
+
         let palabrasCoincidentes = 0;
 
         coincidencias.forEach(coincidencia => {
@@ -201,7 +244,8 @@ class CalculatePlagiarismService {
                 throw new Error('El texto del usuario no puede estar vacío');
             }
 
-            if (textUser.length < 50) {
+            const textoTrimmed = textUser.trim();
+            if (textoTrimmed.length < 50) {
                 throw new Error('El texto debe tener al menos 50 caracteres');
             }
 
@@ -215,11 +259,16 @@ class CalculatePlagiarismService {
                     titulo: null,
                     fecha: null,
                     esPlagio: false,
+                    nivel: 'bajo',
+                    coincidenciasSustanciales: [],
+                    porcentajeCoincidente: 0,
+                    totalCoincidencias: 0,
+                    palabrasComparadas: 0,
                     mensaje: 'No hay artículos disponibles para comparar'
                 };
             }
 
-            const textoLimpioUsuario = this.limpiarTexto(textUser);
+            const textoLimpioUsuario = this.limpiarTexto(textoTrimmed);
 
             let maxSimilitud = 0;
             let articuloMasSimilar = null;
@@ -233,13 +282,11 @@ class CalculatePlagiarismService {
                     maxSimilitud = similitud;
                     articuloMasSimilar = articulo;
 
-                    // Buscar coincidencias sustanciales
                     coincidenciasSustanciales = this.encontrarCoincidenciasSustanciales(
                         textoLimpioUsuario,
                         articulo.contenidoLimpio
                     );
 
-                    // Calcular porcentaje de texto que coincide
                     porcentajeCoincidente = this.calcularPorcentajeTextoCoincidente(
                         textoLimpioUsuario,
                         articulo.contenidoLimpio,
@@ -248,7 +295,7 @@ class CalculatePlagiarismService {
                 }
             }
 
-            // Decisión más inteligente sobre plagio
+            // Misma lógica de decisión sobre plagio
             let esPlagio = false;
             let nivel = 'bajo';
 
@@ -264,17 +311,18 @@ class CalculatePlagiarismService {
             } else if (maxSimilitud > 25) {
                 esPlagio = false;
                 nivel = 'bajo';
-                maxSimilitud = Math.min(maxSimilitud, 25); // Limitar similitud baja
+                maxSimilitud = Math.min(maxSimilitud, 25);
             }
 
-            // Si hay coincidencias sustanciales, aumentar la similitud
             if (coincidenciasSustanciales.length > 0) {
                 const bonusCoincidencias = Math.min(porcentajeCoincidente * 2, 30);
                 maxSimilitud = Math.min(maxSimilitud + bonusCoincidencias, 100);
             }
 
+            const palabrasComparadas = textoLimpioUsuario.split(' ').filter(p => p).length;
+
             return {
-                porcentaje: Math.min(maxSimilitud, 100).toFixed(2),
+                porcentaje: Math.min(parseFloat(maxSimilitud), 100).toFixed(2),
                 archivo: articuloMasSimilar?.nameFile || null,
                 autor: articuloMasSimilar?.autor || null,
                 titulo: articuloMasSimilar?.titulo || null,
@@ -282,13 +330,14 @@ class CalculatePlagiarismService {
                 esPlagio: esPlagio,
                 nivel: nivel,
                 coincidenciasSustanciales: coincidenciasSustanciales.slice(0, 5),
-                porcentajeCoincidente: porcentajeCoincidente.toFixed(2),
+                porcentajeCoincidente: parseFloat(porcentajeCoincidente).toFixed(2),
                 totalCoincidencias: coincidenciasSustanciales.length,
-                palabrasComparadas: textoLimpioUsuario.split(' ').length,
+                palabrasComparadas: palabrasComparadas,
                 mensaje: this.generarMensaje(esPlagio, nivel, maxSimilitud, porcentajeCoincidente)
             };
 
         } catch (error) {
+            console.error('Error en calculatePlagiarism:', error.message);
             throw error;
         }
     }
@@ -296,7 +345,7 @@ class CalculatePlagiarismService {
     generarMensaje(esPlagio, nivel, similitud, porcentajeCoincidente) {
         if (esPlagio) {
             if (nivel === 'critico') {
-                return `🚨 PLAGIO DETECTADO (${similitud.toFixed(2)}% similitud, ${porcentajeCoincidente}% texto coincidente)`;
+                return `🚨 PLAGIO DETECTADO (${similitud.toFixed(2)}% similitud, ${porcentajeCoincidente.toFixed(2)}% texto coincidente)`;
             } else if (nivel === 'alto') {
                 return `⚠️ ALTO NIVEL DE PLAGIO (${similitud.toFixed(2)}% similitud)`;
             } else {

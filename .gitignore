@@ -1,1 +1,3 @@
 node_modules
+/books/jsons/
+/books/pdfs/
