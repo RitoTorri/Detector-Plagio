@@ -2,6 +2,8 @@
 
 Una aplicación web para detectar posibles plagios en textos, comparándolos con una amplia base de libros digitales. El sistema procesa automáticamente libros en formato PDF, transformándolos a JSON para optimizar la velocidad de búsqueda y realizar comparaciones más eficientes, identificando posibles casos de plagio con precisión y rapidez.
 
+Si estas interesado en ver una presentacion del proyecto puedes ir a este vonculo y verlo en formato presentación: https://www.canva.com/design/DAG50TxxG3Q/QrqFXpYuMd4uYKBy6QPhrg/edit?utm_content=DAG50TxxG3Q&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
 ## 🛠 Tecnologías Utilizadas
 
 <div align="center">
