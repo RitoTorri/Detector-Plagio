@@ -22,7 +22,7 @@ El proyecto incluye una carpeta `books` organizada en:
 - **`pdfs`** - Contiene los libros en formato PDF
 - **`jsons`** - Archivos generados automáticamente a partir de la conversión de PDFs
 
-## 📥 Formatos de Archios/Libros
+## 📥 Formatos de Archivos/Libros
 
 ### Formatos de nombre de archivo:
 Puedes expandir nuestra biblioteca añadiendo libros a la carpeta `books/pdfs`. El nombre de cada archivo debe seguir este formato:
