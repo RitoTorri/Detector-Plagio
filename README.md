@@ -35,6 +35,12 @@ nombre-del-libro, nombre-autor.pdf
 el-libro-de-la-muerte, jesus-perez.pdf
 ```
 
+Otras de las cosas por aclarar: 
+1. El libro no puede contener imagenes, solo texto plano.
+
+Ejemplo:  
+![Descripción de la imagen](/public/img/Ejemplo.png)
+
 > **Nota:** Los archivos JSON se generan automáticamente, no es necesario crearlos manualmente.
 
 ## 🚀 Instalación y Ejecución
