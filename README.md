@@ -16,14 +16,15 @@ El usuario ingresa un texto y el programa analiza automáticamente si existe con
 - 📚 Título del libro donde se encontró el texto
 - ✍️ Autor de la obra
 
-### 🧠 Arquitectura del Sistema
+## 🧠 Arquitectura del Sistema
 
 El proyecto incluye una carpeta `books` organizada en:
 - **`pdfs`** - Contiene los libros en formato PDF
 - **`jsons`** - Archivos generados automáticamente a partir de la conversión de PDFs
 
-## 📥 Agregar Nuevos Libros
+## 📥 Formatos de Archios/Libros
 
+### Formatos de nombre de archivo:
 Puedes expandir nuestra biblioteca añadiendo libros a la carpeta `books/pdfs`. El nombre de cada archivo debe seguir este formato:
 
 ```
@@ -35,11 +36,16 @@ nombre-del-libro, nombre-autor.pdf
 el-libro-de-la-muerte, jesus-perez.pdf
 ```
 
-Otras de las cosas por aclarar: 
-1. El libro no puede contener imagenes, solo texto plano.
+### Formato de contenido del archivo:
 
-Ejemplo:  
+El contenido del archivo debe ser un texto plano, sin formato de imagen.
+
+**Ejemplo**:  
+<div style="text-align: center">
+
 ![Descripción de la imagen](/public/img/Ejemplo.png)
+
+</div>
 
 > **Nota:** Los archivos JSON se generan automáticamente, no es necesario crearlos manualmente.
 
